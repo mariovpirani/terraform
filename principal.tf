@@ -5,6 +5,9 @@ terraform {
             source = "hashicorp/azurerm"
             version = ">= 2.26"
         }
+        null = {
+          version = "~> 3.0.0"
+        }
     }
 }
 
@@ -136,6 +139,7 @@ data "azurerm_public_ip" "ip-tarefa01"{
 
 
 resource "null_resource" "install-apache" {
+  
   connection {
     type = "ssh"
     host = data.azurerm_public_ip.ip-tarefa01.ip_address
