@@ -1,0 +1,5 @@
+user="bross"
+pwd_user="Tarefa01!"
+location="West Europe"
+name="tarefa01"
+computer_name="bross"
