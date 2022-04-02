@@ -5,9 +5,6 @@ terraform {
             source = "hashicorp/azurerm"
             version = ">= 2.26"
         }
-        null = {
-          version = "~> 3.0.0"
-        }
     }
 }
 
@@ -23,8 +20,9 @@ resource "azurerm_resource_group" "tarefa01" {
     name = var.name
     location = var.location  
 }
+
 resource "azurerm_virtual_network" "vnet-tarefa01" {
-    name = "vnet-tarefa"
+    name = "vnet-tarefa01"
     location = azurerm_resource_group.tarefa01.location
     resource_group_name = azurerm_resource_group.tarefa01.name
     address_space = [ "10.0.0.0/16" ]
@@ -34,12 +32,11 @@ resource "azurerm_virtual_network" "vnet-tarefa01" {
 }
 
 
-
-resource "azurerm_subnet" "sub-tarefa01" {
-    name = "sub-vnet-tarefa"
-    resource_group_name = azurerm_resource_group.tarefa01.name
-    virtual_network_name = azurerm_virtual_network.vnet-tarefa01.name
-    address_prefixes = [ "10.0.0.0/1" ]
+resource "azurerm_subnet" "subtarefa01" {
+  name                 = "subvnet-tarefa01"
+  resource_group_name  = azurerm_resource_group.tarefa01.name
+  virtual_network_name = azurerm_virtual_network.vnet-tarefa01.name
+  address_prefixes     = ["10.0.1.0/24"]
 }
 
 resource "azurerm_public_ip" "tarefa01-publicip" {
@@ -47,6 +44,9 @@ resource "azurerm_public_ip" "tarefa01-publicip" {
     location                     = azurerm_resource_group.tarefa01.location
     resource_group_name          = azurerm_resource_group.tarefa01.name
     allocation_method            = "Static"
+    tags = {
+      environment = "Production"
+    }
 }
 
 resource "azurerm_network_security_group" "mytarefa01nsg" {
@@ -54,16 +54,32 @@ resource "azurerm_network_security_group" "mytarefa01nsg" {
     location            = azurerm_resource_group.tarefa01.location
     resource_group_name = azurerm_resource_group.tarefa01.name
     security_rule {
-        name                       = "SSH"
-        priority                   = 1001
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "Tcp"
-        source_port_range          = "*"
-        destination_port_range     = "22"
-        source_address_prefix      = "*"
-        destination_address_prefix = "*"
-    }
+    name                       = "SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "web"
+    priority                   = 1003
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags = {
+    environment = "Production"
+  }
 }
 
 resource "azurerm_network_interface" "nic-tarefa01" {
@@ -73,7 +89,7 @@ resource "azurerm_network_interface" "nic-tarefa01" {
 
     ip_configuration {
         name                          = "ip-tarefa01nic"
-        subnet_id                     = azurerm_subnet.sub-tarefa01.id
+        subnet_id                     = azurerm_subnet.subtarefa01.id
         private_ip_address_allocation = "Dynamic"
         public_ip_address_id          = azurerm_public_ip.tarefa01-publicip.id
     }
@@ -84,8 +100,8 @@ resource "azurerm_network_interface_security_group_association" "nic-nsg-terrafo
   network_security_group_id = azurerm_network_security_group.mytarefa01nsg.id
 }
 
-resource "azurerm_storage_account" "storageterraform" {
-    name                        = "storageaccountmyvm"
+resource "azurerm_storage_account" "storagetarefaterraform" {
+    name                        = "storagebross"
     resource_group_name         = azurerm_resource_group.tarefa01.name
     location                    = azurerm_resource_group.tarefa01.location
     account_tier                = "Standard"
@@ -170,12 +186,12 @@ resource "null_resource" "upload-app" {
 
   provisioner "file" {
     source = "app"
-    destination = "home/${var.username}"
+    destination = "/home/${var.username}"
   }
   // testando 
   provisioner "file" {
     source = "app"
-    destination = "var/www/html/"
+    destination = "/var/www/html/"
   }
   depends_on = [
     azurerm_virtual_machine.vm-tarefa01

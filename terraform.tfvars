@@ -1,5 +1,5 @@
-user="bross"
-pwd_user="Tarefa01!"
-location="West Europe"
+username="bross"
+secret_pwd="Tarefa01!"
+location="eastus"
 name="tarefa01"
 computer_name="bross"
