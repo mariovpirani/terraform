@@ -188,11 +188,6 @@ resource "null_resource" "upload-app" {
     source = "app"
     destination = "/home/${var.username}"
   }
-  // testando 
-  provisioner "file" {
-    source = "app"
-    destination = "/var/www/html/"
-  }
   depends_on = [
     azurerm_virtual_machine.vm-tarefa01
   ]

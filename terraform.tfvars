@@ -1,5 +1,5 @@
 username="bross"
 secret_pwd="Tarefa01!"
-location="eastus"
+location="australiaeast"
 name="tarefa01"
 computer_name="bross"
