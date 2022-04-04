@@ -4,7 +4,7 @@
 Subir uma máquina virtual no Azure, instalar o Apache2 e que esteja acessível no host da máquina na porta 80.
 
 Integrantes:
-2200570 - MARIO LUIZ VEIGA PIRANI
+2200570 - MARIO LUIZ VEIGA PIRANI<br/>
 2201653 - VINICIUS DE SOUZA ISAIAS
 
 ### Login Azure
